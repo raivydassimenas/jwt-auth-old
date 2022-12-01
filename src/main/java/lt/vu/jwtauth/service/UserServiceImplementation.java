@@ -6,9 +6,6 @@ import lt.vu.jwtauth.domain.Role;
 import lt.vu.jwtauth.domain.User;
 import lt.vu.jwtauth.repo.RoleRepo;
 import lt.vu.jwtauth.repo.UserRepo;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,15 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-@ComponentScan(basePackages = "lt.vu.jwtauth.config")
 public class UserServiceImplementation implements UserService, UserDetailsService {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
@@ -44,15 +39,19 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     @Override
     public void addRoleToUser(String username, String rolename) {
-        User user = userRepo.findByUsername(username);
-        Role role = roleRepo.findByRolename(rolename);
+        Optional<User> user = userRepo.findByUsername(username);
+        Optional<Role> role = roleRepo.findByRolename(rolename);
 
-        user.getRoles().add(role);
+        if (user.isPresent() && role.isPresent()) {
+            user.get().getRoles().add(role.get());
+        }
     }
 
     @Override
     public User getUser(String username) {
-        return userRepo.findByUsername(username);
+        return userRepo
+                .findByUsername(username).
+                orElseThrow(() -> new UsernameNotFoundException("Username not found"));
     }
 
     @Override
@@ -62,22 +61,31 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUsername(username);
+//        Optional<User> user = userRepo.findByUsername(username);
+//
+//        if (user == null) {
+//            log.error("User not found in the database");
+//            throw new UsernameNotFoundException("User not found in the database");
+//        } else {
+//            log.info("User found in the database: {}", username);
+//        }
+//
+//        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+//
+//        user.getRoles().forEach(role ->
+//        {
+//            authorities.add(new SimpleGrantedAuthority(role.getName()));
+//        });
+//
+//        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
 
-        if (user == null) {
-            log.error("User not found in the database");
-            throw new UsernameNotFoundException("User not found in the database");
-        } else {
-            log.info("User found in the database: {}", username);
-        }
-
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-
-        user.getRoles().forEach(role ->
-        {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        });
-
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return userRepo
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
     }
+
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 }

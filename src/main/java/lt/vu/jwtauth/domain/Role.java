@@ -1,7 +1,6 @@
 package lt.vu.jwtauth.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -10,14 +9,18 @@ import javax.persistence.Id;
 
 import static javax.persistence.GenerationType.AUTO;
 
-@Entity @Data @NoArgsConstructor @AllArgsConstructor
+@Entity @NoArgsConstructor @AllArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long id;
     private String rolename;
 
-    public String getName() {
-        return rolename;
+//    public String getName() {
+//        return rolename;
+//    }
+
+    public String getRolename() {
+        return this.rolename;
     }
 }
