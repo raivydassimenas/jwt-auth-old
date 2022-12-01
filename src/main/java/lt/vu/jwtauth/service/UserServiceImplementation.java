@@ -6,13 +6,18 @@ import lt.vu.jwtauth.domain.Role;
 import lt.vu.jwtauth.domain.User;
 import lt.vu.jwtauth.repo.RoleRepo;
 import lt.vu.jwtauth.repo.UserRepo;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service @RequiredArgsConstructor @Transactional @Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
+@ComponentScan(basePackages = "lt.vu.jwtauth.config")
 public class UserServiceImplementation implements UserService {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
