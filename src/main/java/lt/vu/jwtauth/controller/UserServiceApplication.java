@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 
@@ -25,9 +27,14 @@ public class UserServiceApplication {
             userService.saveRole(new Role(null, "ROLE_MANAGER"));
             userService.saveRole(new Role(null, "ROLE_ADMIN"));
             userService.saveRole(new Role(null, "ROLE_SUPER_ADMIN"));
-            userService.saveUser(new User(null, "John", "john", "1234", new ArrayList<>()));
+            userService.saveUser(new User(null, "John", "john", "1234", new ArrayList<>(), new ArrayList<>()));
 
             userService.addRoleToUser("john", "ROLE_USER");
         };
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
